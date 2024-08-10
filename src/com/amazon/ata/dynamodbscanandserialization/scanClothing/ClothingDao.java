@@ -1,9 +1,15 @@
 package com.amazon.ata.dynamodbscanandserialization.scanClothing;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides access to the ClothingStore table.
@@ -26,6 +32,14 @@ public class ClothingDao {
      */
     public List<Clothing> scanByClothingType(final String clothingType) {
         //TODO: replace the below code
-        return Collections.emptyList();
+        Map<String, AttributeValue> valueMap = new HashMap<>();
+        valueMap.put(":clothingType", new AttributeValue().withS(clothingType));
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression("clothingType = :clothingType")
+                .withExpressionAttributeValues(valueMap);
+
+        PaginatedScanList<Clothing> clothingList = mapper.scan(Clothing.class, scanExpression);
+        return clothingList;
     }
 }
